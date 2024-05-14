@@ -23,6 +23,7 @@ export const login = async (req, res) => {
   try {
     const user = await UserModel.findOne({ username });
 
+
     if (!user) {
       return res.status(404).json({ message: 'user not founddd' });
     }
@@ -43,15 +44,17 @@ export const login = async (req, res) => {
       { expiresIn: age }
     );
 
+    const { password: userPassword, ...userInfo } = user;
+
     // res.setHeader('Set-Cookie', 'test=' + 'myValue').json('success');
     res
       .cookie('token', token, {
-      httpOnly: true,
-      // secure: true
-      maxAge: age,
+        httpOnly: true,
+        // secure: true
+        maxAge: age,
       })
       .status(200)
-      .json({ message: 'login successful' })
+      .json(userInfo)
   } catch (e) {
     console.log(e);
     res.status(500).json({message: 'logging in didnt work'})
@@ -61,6 +64,3 @@ export const login = async (req, res) => {
 export const logout = (req, res) => {
   res.clearCookie('token').status(200).json({ message: 'logout was successful' });
 }
-
-// mongodb+srv://jade:Guitar12@estatecluster.gayuvrf.mongodb.net/estate/?retryWrites=true&w=majority&appName=estateCluster
-// mongodb+srv://jade:Guitar12@estatecluster.gayuvrf.mongodb.net/?retryWrites=true&w=majority&appName=estateCluster
