@@ -38,7 +38,8 @@ export const login = async (req, res) => {
 
     const token = jwt.sign(
       {
-        id: user.id
+        id: user.id,
+        isAdmin: true,
       },
       'jwtsecretkey',
       { expiresIn: age }

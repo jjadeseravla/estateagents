@@ -16,7 +16,8 @@ app.use(cookieParser())
 
 app.use('/api/posts', postRouter);
 app.use('/api', authRouter);
-app.use('/api/testRouter', testRouter);
+app.use('/api/test', testRouter);
+//http://localhost:8080/api/test/should-be-logged-in
 
 mongoose.connect('mongodb+srv://jade:Guitar12@estatecluster.gayuvrf.mongodb.net/?retryWrites=true&w=majority&appName=estateCluster')
   .then(() => {
