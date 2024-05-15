@@ -17,7 +17,8 @@ export const AuthContextProvider = ({ children }) => {
     // Update localStorage immediately after updating state
     //localStorage will always be updated with the latest user data whenever updateUser is called. 
     //This should resolve the issue you're encountering with the user data not being updated in the localStorage.
-    localStorage.setItem('user', JSON.stringify(data));
+      console.log('----------------------')
+      localStorage.setItem('user', JSON.stringify(data));
     return data;
     });
   }

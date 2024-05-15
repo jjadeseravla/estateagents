@@ -21,7 +21,7 @@ export const login = async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    const user = await UserModel.findOne({ username });
+    const user = await UserModel.findOne({ username }).lean();
 
 
     if (!user) {
@@ -36,14 +36,17 @@ export const login = async (req, res) => {
 
     const age = 1000 * 60 * 60 * 24 * 7; // 1 week
 
+    console.log('---------token usr', user)
     const token = jwt.sign(
       {
-        id: user.id,
+        id: user._id,
         isAdmin: true,
       },
       'jwtsecretkey',
       { expiresIn: age }
     );
+
+    console.log('authcontroller token', token); //do get token
 
     const { password: userPassword, ...userInfo } = user;
 

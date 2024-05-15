@@ -10,6 +10,8 @@ export const shouldBeLoggedIn = async (req, res) => {
 export const shouldBeAdmin = async (req, res) => {
   const token = req.cookies.token;
 
+  console.log('testcontroller token', token); // have token
+
   if (!token) return res.status(401).json({ message: 'no token, so not authenticated' });
 
   jwt.verify(token, 'jwtsecretkey', async (err, payload) => {

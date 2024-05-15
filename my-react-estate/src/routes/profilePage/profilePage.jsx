@@ -5,6 +5,7 @@ import "./profilePage.scss";
 import { useNavigate } from "react-router-dom";
 import { useContext, useEffect } from "react";
 import { AuthContext } from '../../context/AuthContext.jsx';
+import { Link } from 'react-router-dom';
 
 function ProfilePage() {
 
@@ -38,8 +39,10 @@ const handleLogout = async() => {
       <div className="details">
         <div className="wrapper">
           <div className="title">
-            <h1>User Information</h1>
+                <h1>User Information</h1>
+                <Link to="/profile/update">
             <button>Update Profile</button>
+                </Link>
           </div>
           <div className="info">
             <span>
