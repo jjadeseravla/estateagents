@@ -1,14 +1,14 @@
-import HomePage from "./routes/homePage/homePage";
+import HomePage from "./routes/homePage/homePage.jsx";
 import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
-import ListPage from "./routes/listPage/listPage";
-import Layout from "./routes/layout/layout";
-import SinglePage from "./routes/singlePage/singlePage";
-import ProfilePage from "./routes/profilePage/profilePage";
-import Login from "./routes/login/login";
-import Register from "./routes/register/register";
+import ListPage from "./routes/listPage/listPage.jsx";
+import Layout from "./routes/layout/layout.jsx";
+import SinglePage from "./routes/singlePage/SinglePage.jsx";
+import ProfilePage from "./routes/profilePage/profilePage.jsx";
+import Login from "./routes/login/login.jsx";
+import Register from "./routes/register/register.jsx";
 
 function App() {
   const router = createBrowserRouter([
