@@ -1,12 +1,15 @@
 import "./login.scss";
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import apiRequest from "../../lib/apiReq";
 import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from "../../context/AuthContext";
 
 function Login() {
 
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const {updateUser } = useContext(AuthContext);
 
   const navigate = useNavigate();
 
@@ -19,14 +22,19 @@ function Login() {
     const password = formData.get('password');
 
     try {
-      const res = apiRequest.post('/auth/login', {
+      const res = await apiRequest.post('/auth/login', {
         username, password
       });
-      localStorage.setItem('user', JSON.stringify(res.data));
+      console.log('Response data:', res.data); // Log response data
+
+
+      updateUser(res.data);
+      // localStorage.setItem('user', JSON.stringify(res.data));
 
       // isLoading(false);
       navigate('/');
     } catch (e) {
+      console.error('Error:', e); // Log error for debugging
       setError(e.response.data.message);
     } finally {
       setIsLoading(false);
