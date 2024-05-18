@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+// import PostModel from './post.model';
 
 const Schema = mongoose.Schema;
 
@@ -27,7 +28,11 @@ const userSchema = new Schema({
   createdAt: {
     type: Date, // Change type to Date
     default: Date.now // Set default value to current timestamp
-  }
+  },
+  posts: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'PostModel' // Reference the PostModel
+  }]
 });
   
   userSchema.virtual('id').get(function() { // Manually create virtual id field

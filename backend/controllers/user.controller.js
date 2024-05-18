@@ -25,19 +25,23 @@ export const getUser = async (req, res) => {
 export const updateUser = async (req, res) => {
   const id = req.params.id;
   const tokenUserId = req.userId; // should be there as passed it from payload in the verifyToken fn
-  const body = req.body;
+  const token1 = req.cookies.token;
+  const {password, ...inputs} = req.body;
 
-  console.log(id, 'id', tokenUserId, 'tokenUserId') // tokenuserid is undefined
-  // console.log(id, 'id', tokenUserId, 'tokenUserId', req) // tokenuserid is undefined
+  console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&', req,
+    id, 'id',
+    tokenUserId, 'tokenUserId',
+    'token1', token1
+  ) // tokenuserid is undefined
   
   if (id !== tokenUserId) {
     return res.status(403).json({message: 'not authorised as id does not match tokenuserid'})
   }
   
-  console.log('**************')
   try {
-    const user = await UserModel.findByIdAndUpdate(id, body, { new: true });
-    res.status(200).json(updatedUser)
+    const updatedUser = await UserModel.findByIdAndUpdate(id, body, { new: true });
+    const { password: userPassword, ...rest } = updatedUser; // so as to exclude passowrd from being sent in the response
+    res.status(200).json(rest);
   } catch (e) {
     console.log(e);
     res.status(500).json({ message: 'failed to get this user' });
@@ -45,8 +49,16 @@ export const updateUser = async (req, res) => {
 }
 
 export const deleteUser = async (req, res) => {
-  try {
+  const id = req.params.id;
+  // const tokenUserId = req.userId;
 
+  // if (id !== tokenUserId) {
+  //   return res.status(403).json({message: 'not authorised as id does not match tokenuserid'})
+  // }
+
+  try {
+    const deletedUser = await UserModel.findByIdAndDelete(id);
+    res.status(200).json({ message: `this user has been deleted: ${deletedUser}` });
   } catch (e) {
     console.log(e);
     res.status(500).json({ message: 'failed to delete this user' });
