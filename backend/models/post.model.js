@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const Schema = mongoose.Schema;
 
-const TypeSchema = new mongoose.Schema({
+const TypeSchema = new Schema({
   content: {
     type: String,
     enum: ['buy', 'rent'],
@@ -10,7 +10,7 @@ const TypeSchema = new mongoose.Schema({
   }
 });
 
-const PropertySchema = new mongoose.Schema({
+const PropertySchema = new Schema({
   property: {
     type: String,
     enum: ['flat', 'house', 'studio'],
@@ -32,8 +32,8 @@ const postSchema = new Schema({
     type: Number,
     required: true,
   },
-  img: {
-    type: String,
+  imgs: {
+    type: [String], // Change to array of strings
     required: true
   },
   address: {
@@ -71,7 +71,11 @@ const postSchema = new Schema({
   createdAt: {
     type: Date, // Change type to Date
     default: Date.now // Set default value to current timestamp
-  }
+  },
+  postDetails: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'PostDetailsModel'
+  }]
 })
 
 const PostModel = mongoose.model('PostModel', postSchema);

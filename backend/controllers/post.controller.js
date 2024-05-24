@@ -12,11 +12,21 @@ export const getPosts = async (req, res) => {
 
 
 export const getPost = async (req, res) => {
-  const id = req.params;
+  const id = req.params.id;
 
   try {
-    const post = await PostModel.findById( id );
-    res.status(200).json(post)
+    const post = await PostModel.findById(id)
+    .populate('postDetails')
+      .populate({
+        path: 'userId',
+        select: 'username avatar'
+      });
+
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+    
+    res.status(200).json(post);
   } catch (e) {
     console.log(e);
     res.status(500).json({message: 'failed to get postssss'})
@@ -31,8 +41,11 @@ export const addPost = async (req, res) => {
   try {
     const newPost = await PostModel.create({
       data: {
-        ...body,
+        ...body.postData,
         userId: tokenUserId,
+        postDetail: {
+          create: body.postDetails,
+        }
       }
     })
     res.status(200).json(newPost);
@@ -71,3 +84,36 @@ export const deletePost = async (req, res) => {
     res.status(500).json({message: 'failed to get postssss'})
   }
 }
+
+
+// /posts
+// {
+//  "postData": {
+  //   "title": "Title1",
+  //   "price": 111,
+//   "imgs": [
+// "https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+// "https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+// "https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+// "https://images.pexels.com/photos/1918291/pexels-photo-1918291.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+      //],
+  //   "address": "address1",
+  //   "city": "City1",
+  //   "bedroom": 2,
+  //   "bathroom": 2,
+  //   "type": "rent",
+  //   "property": "apartment",
+  //   "latitude": "51.5074",
+//   "longitude": "-0.1278"
+// },
+// "postDetails": {
+//   "desc": "Desc1",
+//   "utilities": "owner is responsible",
+//   "pet": "allowed",
+//   "income": "3 x income",
+//   "size": 88,
+//   "school": 1200,
+//   "bus": 800,
+//   "restaurant": 1500
+  // }
+// }

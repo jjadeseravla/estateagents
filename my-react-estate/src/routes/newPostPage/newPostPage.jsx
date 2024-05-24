@@ -1,12 +1,59 @@
 import "./newPostPage.scss";
+import ReactQuill from 'react-quill';
+import "react-quill/dist/quill.snow.css";
+import { useState } from 'react';
+import apiRequest from '../../lib/apiReq';
+import UploadWidget from "../../components/uploadWidget/UploadWidget";
 
 function NewPostPage() {
+
+  const [value, setValue] = useState('');
+  const [error, setError] = useState('');
+  const [images, setImages] = useState([]);
+
+  const handleSubmit = async(e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const inputs = Object.fromEntries(formData);
+    console.log(inputs, 'INPUTSSSS');
+
+    try {
+      const res = await apiRequest.post("/posts", {
+        postData: {
+          title: inputs.title,
+          price: parseInt(inputs.price),
+          addess: inputs.address,
+          city: inputs.city,
+          bedroom: parseInt(inputs.bedroom),
+          bathroom: parseInt(inputs.bathroom),
+          type: inputs.type,
+          property: inputs.property,
+          latitude: inputs.latitude,
+          longitude: inputs.longitude,
+          images: images,
+        },
+        postDetails: {
+          desc: value,
+          utilities: inputs.utilities,
+          pet: inputs.pet,
+          income: inputs.income,
+          size: parseInt(inputs.size),
+          school: parseInt(inputs.school),
+          bus: parseInt(inputs.bus),
+          restaurant: parseInt(inputs.restaurant),
+        }
+      })
+    } catch (e) {
+      setError(e)
+    }
+  }
+
   return (
     <div className="newPostPage">
       <div className="formContainer">
         <h1>Add New Post</h1>
         <div className="wrapper">
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="item">
               <label htmlFor="title">Title</label>
               <input id="title" name="title" type="text" />
@@ -20,6 +67,7 @@ function NewPostPage() {
               <input id="address" name="address" type="text" />
             </div>
             <div className="item description">
+            <ReactQuill theme="snow" onChange={setValue} value={value} />
               <label htmlFor="desc">Description</label>
             </div>
             <div className="item">
@@ -100,11 +148,25 @@ function NewPostPage() {
               <label htmlFor="restaurant">Restaurant</label>
               <input min={0} id="restaurant" name="restaurant" type="number" />
             </div>
-            <button className="sendButton">Add</button>
+            <button className="sendButton">Update</button>
+            {error && <span>{error}</span>}
           </form>
         </div>
       </div>
-      <div className="sideContainer"></div>
+      <div className="sideContainer">
+        {images.map((image, index) => (
+          <img src={image} key={index} />
+        ))}
+        <UploadWidget uwConfig={{
+          multiple: true,
+          cloudName: "lamadev",
+          uploadPreset: "estate",
+          maxImageFileSize: 2000000,
+          folder: "posts",
+        }}
+          setState={setImages}
+        />
+      </div>
     </div>
   );
 }

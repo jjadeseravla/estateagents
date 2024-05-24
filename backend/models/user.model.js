@@ -32,6 +32,10 @@ const userSchema = new Schema({
   posts: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'PostModel' // Reference the PostModel
+  }],
+  postDetails: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'PostDetailsModel'
   }]
 });
   
