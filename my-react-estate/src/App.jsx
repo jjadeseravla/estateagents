@@ -85,7 +85,7 @@ import NewPostPage from "./routes/newPostPage/newPostPage.jsx";
 import ProfileUpdatePage from "./routes/profileUpdatePage/ProfileUpdatePage.jsx";
 import Login from "./routes/login/login.jsx";
 import Register from "./routes/register/register.jsx";
-import RequiredAuth from './routes/layout/requiredAuth.jsx';
+import RequireAuth from './routes/layout/requiredAuth.jsx';
 import { AuthContextProvider } from './context/AuthContext.jsx'; // Ensure this path is correct
 
 function App() {
@@ -104,7 +104,7 @@ function App() {
     },
     {
       path: "/",
-      element: <RequiredAuth />,
+      element: <RequireAuth />,
       children: [
         { path: "/profile/update", element: <ProfileUpdatePage /> },
         { path: "/add", element: <NewPostPage /> }

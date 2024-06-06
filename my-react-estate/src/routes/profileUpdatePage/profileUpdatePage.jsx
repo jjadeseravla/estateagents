@@ -32,7 +32,7 @@ function ProfileUpdatePage() {
      } = Object.fromEntries(formData);
 
     try {
-      const res = await apiRequest.put(`/users/${currentUser.id}`, {
+      const res = await apiRequest.put(`/users/${currentUser._id}`, {
         username,
         email,
         password,
@@ -93,6 +93,8 @@ function ProfileUpdatePage() {
       </div>
     </div>
   );
+
+  // return <div>here</div>
 }
 
 export default ProfileUpdatePage;

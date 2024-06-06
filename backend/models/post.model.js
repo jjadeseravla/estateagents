@@ -2,21 +2,23 @@ import mongoose from 'mongoose';
 
 const Schema = mongoose.Schema;
 
-const TypeSchema = new Schema({
-  content: {
-    type: String,
-    enum: ['buy', 'rent'],
-    required: true,
-  }
-});
+// const TypeSchema = new Schema({
+//   content: {
+//     type: String,
+//     enum: ['buy', 'rent'],
+//     required: true
+//   }
+//   // factors: [{type: String, enum: ['1', '2', '3'], required: }] 
 
-const PropertySchema = new Schema({
-  property: {
-    type: String,
-    enum: ['flat', 'house', 'studio'],
-    required: true,
-  }
-})
+// });
+
+// const PropertySchema = new Schema({
+//   property: {
+//     type: String,
+//     enum: ['flat', 'house', 'studio', 'apartment'],
+//     required: true,
+//   }
+// })
 
 const postSchema = new Schema({
   userId: {
@@ -61,12 +63,18 @@ const postSchema = new Schema({
     required: true
   },
   type: {
-    type: TypeSchema,
+    type: String,
+    enum: ['buy', 'rent'],
     required: true
   },
+  // type: {
+  //   type: TypeSchema,
+  //   required: true
+  // },
   property: {
-    type: PropertySchema,
-    required: true
+    type: String,
+    enum: ['flat', 'house', 'studio', 'apartment'],
+    required: true,
   },
   createdAt: {
     type: Date, // Change type to Date

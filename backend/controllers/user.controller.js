@@ -1,4 +1,5 @@
 import UserModel from '../models/user.model.js';
+import bcrypt from '../node_modules/bcrypt/bcrypt.js'; 
 
 export const getUsers = async (req, res) => {
   try {
@@ -28,7 +29,8 @@ export const updateUser = async (req, res) => {
   const token1 = req.cookies.token;
   const {password, ...inputs} = req.body;
 
-  console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&', req,
+
+  console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&',
     id, 'id',
     tokenUserId, 'tokenUserId',
     'token1', token1
@@ -39,7 +41,9 @@ export const updateUser = async (req, res) => {
   }
   
   try {
-    const updatedUser = await UserModel.findByIdAndUpdate(id, body, { new: true });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    console.log('-------hashedPassword-----', hashedPassword)
+    const updatedUser = await UserModel.findByIdAndUpdate(id, { ...req.body, password: hashedPassword },  { new: true });
     const { password: userPassword, ...rest } = updatedUser; // so as to exclude passowrd from being sent in the response
     res.status(200).json(rest);
   } catch (e) {

@@ -6,6 +6,7 @@ import postRouter from './routes/post.route.js';
 import authRouter from './routes/auth.route.js';
 import testRouter from './routes/test.route.js';
 import userRouter from './routes/user.route.js';
+import bodyParser from 'body-parser';
 
 const app = express();
 
@@ -13,6 +14,13 @@ app.use(cors({
   origin: 'http://localhost:5173',
   credentials: true
 }));
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
+
+// parse application/json
+app.use(bodyParser.json())
+
 app.use(cookieParser())
 
 app.use('/api/posts', postRouter);

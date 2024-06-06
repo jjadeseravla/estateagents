@@ -36,17 +36,18 @@ export const getPost = async (req, res) => {
 
 export const addPost = async (req, res) => {
   const body = req.body;
+  console.log('----body--------', body)
   const tokenUserId = req.userId; // dont think this works
 
   try {
     const newPost = await PostModel.create({
-      data: {
+      // data: {
         ...body.postData,
         userId: tokenUserId,
         postDetail: {
           create: body.postDetails,
         }
-      }
+      // }
     })
     res.status(200).json(newPost);
   } catch (e) {

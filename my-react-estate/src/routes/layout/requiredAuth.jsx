@@ -32,4 +32,4 @@ function RequireAuth() {
   );
 }
 
-export default { RequireAuth};
+export default RequireAuth;

@@ -22,7 +22,7 @@ function NewPostPage() {
         postData: {
           title: inputs.title,
           price: parseInt(inputs.price),
-          addess: inputs.address,
+          address: inputs.address,
           city: inputs.city,
           bedroom: parseInt(inputs.bedroom),
           bathroom: parseInt(inputs.bathroom),
