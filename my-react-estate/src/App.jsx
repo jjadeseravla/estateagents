@@ -85,6 +85,7 @@ import NewPostPage from "./routes/newPostPage/newPostPage.jsx";
 import ProfileUpdatePage from "./routes/profileUpdatePage/ProfileUpdatePage.jsx";
 import Login from "./routes/login/login.jsx";
 import Register from "./routes/register/register.jsx";
+import { singlePageLoader } from "./lib/loaders.js";
 import RequireAuth from './routes/layout/requiredAuth.jsx';
 import { AuthContextProvider } from './context/AuthContext.jsx'; // Ensure this path is correct
 
@@ -96,7 +97,7 @@ function App() {
       children: [
         { path: "/", element: <HomePage /> },
         { path: "/list", element: <ListPage /> },
-        { path: "/:id", element: <SinglePage /> },
+        { path: "/:id", element: <SinglePage />, loader: singlePageLoader},
         { path: "/profile", element: <ProfilePage /> },
         { path: "/login", element: <Login /> },
         { path: "/register", element: <Register /> }

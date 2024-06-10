@@ -3,6 +3,7 @@ import ReactQuill from 'react-quill';
 import "react-quill/dist/quill.snow.css";
 import { useState } from 'react';
 import apiRequest from '../../lib/apiReq';
+import {useNavigate} from "react-router-dom";
 import UploadWidget from "../../components/uploadWidget/UploadWidget";
 
 function NewPostPage() {
@@ -10,6 +11,8 @@ function NewPostPage() {
   const [value, setValue] = useState('');
   const [error, setError] = useState('');
   const [images, setImages] = useState([]);
+
+  const navigate = useNavigate();
 
   const handleSubmit = async(e) => {
     e.preventDefault();
@@ -42,7 +45,9 @@ function NewPostPage() {
           bus: parseInt(inputs.bus),
           restaurant: parseInt(inputs.restaurant),
         }
-      })
+      });
+      console.log('res.data.id', res.data.id)
+      navigate('/'+res.data._id)
     } catch (e) {
       setError(e)
     }

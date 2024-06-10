@@ -8,6 +8,10 @@ import testRouter from './routes/test.route.js';
 import userRouter from './routes/user.route.js';
 import bodyParser from 'body-parser';
 
+import postDetailsModel from './models/postDetails.model.js';
+
+console.log(postDetailsModel)
+
 const app = express();
 
 app.use(cors({

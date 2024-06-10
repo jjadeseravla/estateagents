@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 
+
 const Schema = mongoose.Schema;
 
 // const TypeSchema = new Schema({
@@ -34,7 +35,7 @@ const postSchema = new Schema({
     type: Number,
     required: true,
   },
-  imgs: {
+  images: {
     type: [String], // Change to array of strings
     required: true
   },
