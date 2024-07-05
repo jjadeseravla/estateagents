@@ -1,4 +1,5 @@
 import UserModel from '../models/user.model.js';
+import savedPostModel from '../models/savedPost.model.js';
 import bcrypt from '../node_modules/bcrypt/bcrypt.js'; 
 
 export const getUsers = async (req, res) => {
@@ -66,5 +67,34 @@ export const deleteUser = async (req, res) => {
   } catch (e) {
     console.log(e);
     res.status(500).json({ message: 'failed to delete this user' });
-  }
+  }  
+}
+
+export const savePost = async (req, res) => {
+  const postId = req.body.postId;
+  // const id = req.params.id;
+  const tokenUserId = req.userId;
+
+  try {
+    const savedPost = await savedPostModel.findOne({
+      userId: tokenUserId,
+      postId: postId
+    }).exec();
+
+    if (savedPost) {
+      await savedPostModel.findByIdAndDelete(req.userId)
+      res.status(200).json({message: 'Post removed from saved list'});
+    } else {
+      await savedPostModel.create({
+        data: {
+          userId: tokenUserId,
+          postId,
+        }
+      })
+      res.status(200).json({ message: 'Post saved' });
+    }
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ message: 'failed to find saved post' });
+  }  
 }

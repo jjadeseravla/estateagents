@@ -1,9 +1,15 @@
 import PostModel from '../models/post.model.js';
+import savedPostModel from '../models/savedPost.model.js';
+import PostDetailsModel from '../models/postDetails.model.js';
+import mongoose from 'mongoose';
+import jwt from 'jsonwebtoken';
 
 export const getPosts = async (req, res) => {
   try {
     const posts = await PostModel.find({});
-    res.status(200).json(posts);
+    // setTimeout(() => {
+      res.status(200).json(posts);
+    // }, 3000);
   } catch (e) {
     console.log(e);
     res.status(500).json({message: 'failed to get postssss'})
@@ -27,36 +33,150 @@ export const getPost = async (req, res) => {
     if (!post) {
       return res.status(404).json({ message: 'Post not found' });
     }
+
+    let userId;
+
+    const token = req.cookies?.token;
+
+    if (!token) {
+      userId = null;
+    } else {
+      jwt.verify(token, 'jwtsecretkey', async (err, payload) => { 
+        if (err) {
+          userId = null;
+        } else {
+          //we are authenticated
+          userId = payload.id;
+        }
+      })
+    }
+
+    const saved = await savedPostModel.findOne({
+      userId: id,
+      postId: postId
+    }).exec(); 
     
-    res.status(200).json(post);
+    res.status(200).json({ ...post, isSaved: saved ? true: false });
   } catch (e) {
     console.log(e);
     res.status(500).json({message: 'failed to get postssss'})
   }
 }
-
 
 export const addPost = async (req, res) => {
   const body = req.body;
-  console.log('----body--------', body)
-  const tokenUserId = req.userId; // dont think this works
+  const tokenUserId = req.userId; // Make sure req.userId is correctly set by middleware
+
+  // Log the body and tokenUserId to debug
+  console.log('----body--------', body);
+  console.log('----tokenUserId--------', tokenUserId);
+
+  if (!body.postData) {
+    return res.status(400).json({ message: "postData is required" });
+  }
+
+  if (!body.postDetail || !body.postDetail.desc) {
+    return res.status(400).json({ message: "postDetail with desc is required" });
+  }
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
   try {
-    const newPost = await PostModel.create({
-      // data: {
-        ...body.postData,
-        userId: tokenUserId,
-        postDetail: {
-          create: body.postDetails,
-        }
-      // }
-    })
-    res.status(200).json(newPost);
-  } catch (e) {
-    console.log(e);
-    res.status(500).json({message: 'failed to get postssss'})
+    console.log('Starting to create new post');
+    const newPost = new PostModel({
+      ...body.postData,
+      userId: tokenUserId
+    });
+
+    const savedPost = await newPost.save({ session });
+    console.log('Saved new post:', savedPost);
+
+    const postDetail = new PostDetailsModel({
+      ...body.postDetail,
+      userId: tokenUserId,
+      postId: savedPost._id
+    });
+
+    const savedPostDetail = await postDetail.save({ session });
+    console.log('Saved post detail:', savedPostDetail);
+
+    savedPost.postDetails.push(savedPostDetail._id);
+    await savedPost.save({ session });
+    console.log('Updated post with post details:', savedPost);
+
+    await session.commitTransaction();
+    session.endSession();
+
+    res.status(200).json(savedPost);
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+
+    console.log('Error occurred:', err);
+    res.status(500).json({ message: "Failed to create post", error: err.message });
   }
+  // try {
+  //   const newPost = await PostModel.create({
+  //     // data: {
+  //       ...body.postData,
+  //       userId: tokenUserId,
+  //     postDetail: [{
+  //       ...body.postDetails,
+  //       }
+  //       ]
+  //     // }
+  //   })
+  //   res.status(200).json(newPost);
+  // } catch (e) {
+  //   console.log(e);
+  //   res.status(500).json({message: 'failed to get postssss'})
+  // }
 }
+
+
+// const session = await mongoose.startSession();
+//   session.startTransaction();
+
+//   try {
+//     const newPost = new PostModel({
+//       ...body.postData,
+//       userId: tokenUserId
+//     });
+
+//     const savedPost = await newPost.save({ session });
+
+//     const postDetail = new PostDetailsModel({
+//       ...body.postDetail,
+//       userId: tokenUserId,
+//       postId: savedPost._id
+//     });
+
+//     const savedPostDetail = await postDetail.save({ session });
+
+//     savedPost.postDetails.push(savedPostDetail._id);
+//     await savedPost.save({ session });
+
+//     await session.commitTransaction();
+//     session.endSession();
+
+//     res.status(200).json(savedPost);
+//   } catch (err) {
+//     await session.abortTransaction();
+//     session.endSession();
+
+//     console.log(err);
+//     res.status(500).json({ message: "Failed to create post" });
+//   }
+
+
+
+
+
+
+
+
+
 
 
 export const updatePost = async (req, res) => {

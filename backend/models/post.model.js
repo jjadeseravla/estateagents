@@ -84,6 +84,10 @@ const postSchema = new Schema({
   postDetails: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'PostDetailsModel'
+  }],
+  SavedPosts: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'SavedPostModel'
   }]
 })
 
