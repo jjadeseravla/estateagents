@@ -1,5 +1,6 @@
 import UserModel from '../models/user.model.js';
-import savedPostModel from '../models/savedPost.model.js';
+import PostModel from '../models/post.model.js';
+import SavedPostModel from '../models/savedPost.model.js';
 import bcrypt from '../node_modules/bcrypt/bcrypt.js'; 
 
 export const getUsers = async (req, res) => {
@@ -76,16 +77,16 @@ export const savePost = async (req, res) => {
   const tokenUserId = req.userId;
 
   try {
-    const savedPost = await savedPostModel.findOne({
+    const savedPost = await SavedPostModel.findOne({
       userId: tokenUserId,
       postId: postId
     }).exec();
 
     if (savedPost) {
-      await savedPostModel.findByIdAndDelete(req.userId)
+      await SavedPostModel.findByIdAndDelete(req.userId)
       res.status(200).json({message: 'Post removed from saved list'});
     } else {
-      await savedPostModel.create({
+      await SavedPostModel.create({
         data: {
           userId: tokenUserId,
           postId,
@@ -97,4 +98,20 @@ export const savePost = async (req, res) => {
     console.log(e);
     res.status(500).json({ message: 'failed to find saved post' });
   }  
+}
+
+export const profilePosts = async (req, res) => {
+  const tokenUserId = req.params.userId;
+
+  try {
+    const userPosts = await PostModel.find({ userId: tokenUserId }).exec();
+
+    const saved = await SavedPostModel.find({ userId: tokenUserId }).populate('postId').exec();
+    const savedPosts = saved.map((item) => item.post);
+
+    res.status(200).json({ userPosts, savedPosts});
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ message: 'failed to get profile posts' });
+  }
 }
