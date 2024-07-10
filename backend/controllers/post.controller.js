@@ -89,6 +89,9 @@ export const addPost = async (req, res) => {
       userId: tokenUserId
     });
 
+
+
+
     const savedPost = await newPost.save({ session });
     console.log('Saved new post:', savedPost);
 
@@ -98,6 +101,10 @@ export const addPost = async (req, res) => {
       postId: savedPost._id
     });
 
+
+
+
+    
     const savedPostDetail = await postDetail.save({ session });
     console.log('Saved post detail:', savedPostDetail);
 

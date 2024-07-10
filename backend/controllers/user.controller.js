@@ -106,7 +106,7 @@ export const profilePosts = async (req, res) => {
   try {
     const userPosts = await PostModel.find({ userId: tokenUserId }).exec();
 
-    const saved = await SavedPostModel.find({ userId: tokenUserId }).populate('postId').exec();
+    const saved = await SavedPostModel.find({ userId: tokenUserId }).populate('post').exec();
     const savedPosts = saved.map((item) => item.post);
 
     res.status(200).json({ userPosts, savedPosts});

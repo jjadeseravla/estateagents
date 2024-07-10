@@ -6,11 +6,17 @@ import postRouter from './routes/post.route.js';
 import authRouter from './routes/auth.route.js';
 import testRouter from './routes/test.route.js';
 import userRouter from './routes/user.route.js';
+import messageRouter from './routes/message.route.js';
+import chatRouter from './routes/chat.route.js';
 import bodyParser from 'body-parser';
 
 import postDetailsModel from './models/postDetails.model.js';
+import messageModel from './models/message.model.js';
+import chatModel from './models/chat.model.js';
 
 console.log(postDetailsModel)
+console.log(messageModel)
+console.log(chatModel)
 
 const app = express();
 
@@ -32,6 +38,8 @@ app.use('/api', authRouter);
 app.use('/api/test', testRouter);
 //http://localhost:8080/api/test/should-be-logged-in
 app.use('/api/users', userRouter)
+app.use('/api/messages', messageRouter);
+app.use('/api/chats', chatRouter);
 
 mongoose.connect('mongodb+srv://jade:Guitar12@estatecluster.gayuvrf.mongodb.net/?retryWrites=true&w=majority&appName=estateCluster')
   .then(() => {
