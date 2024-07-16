@@ -23,6 +23,7 @@ console.log('---------- 1')
       chatId,
       userId: tokenUserId
     });
+    console.log('M e s s a g e ', message )
 
     chat.messages.push(message._id);
     chat.seenBy = [tokenUserId]; // these like seenBy are a method i have stated in the chat Model

@@ -3,15 +3,20 @@ import { AuthContext } from "../../context/AuthContext";
 import "./chat.scss";
 import apiRequest from "../../lib/apiReq";
 import { format } from 'timeago.js';
+import { SocketContext } from "../../context/SocketContext";
 
 function Chat({chats}) {
   const [chat, setChat] = useState(null);
   const { currentUser } = useContext(AuthContext);
+  const { socket } = useContext(SocketContext);
 
   console.log('chats.receiver', chats.receiver);
 
   const handleOpenChat = async(id, receiver) => {
     try {
+      console.log('*********', id, receiver); // Log the id and receiver
+      const apiUrl = "/chats/" + id;
+      console.log('API URL:', apiUrl); // Log the constructed API URL
       const res = await apiRequest("/chats/" + id);
       setChat({ ...res.data, receiver });
     } catch (e) {
@@ -26,35 +31,47 @@ function Chat({chats}) {
 
     if (!text) return;
     try {
-      const res = await apiRequest.post("/messages/" + chat.id, { text });
+      console.log('c h a t', chat, "{text}", {text})
+      const res = await apiRequest.post("/messages/" + chat._id, { text });
       setChat(prev => ({ ...prev, messages: [...prev.messages, res.data] }));
       e.target.reset();
+
+      //send other users info too and send my message in data
+      socket.emit("sendMessage", {
+        receiverId: chat.receiver.id,
+        data: res.data,
+      })
     } catch (e) {
       console.log(e)
     }
   }
 
-  console.log('chatssssss', chats)
+  console.log('chatssssss', chats);
+
+  const testSocket = () => {
+    socket.emit("test", "hi from client");
+  }
 
   return (
     <div className="chat">
+      <button onClick={testSocket}>test meeeee</button>
       <div className="messages">
         <h1>Messages</h1>
         {chats?.map((eachChat) => (
           <div className="message"
-            key={eachChat.id}
+            key={eachChat._id}
             style={{
               backgroundColor: eachChat.seenBy.includes(currentUser.id)
                 ? "white" :
                 "#fecd514e"
             }}
-            onClick={() => handleOpenChat(eachChat.id, eachChat.receiver)}
+            onClick={() => handleOpenChat(eachChat._id, eachChat.receiver)}
           >
           <img
-            src={eachChat.receiver.avatar || "/noavatar.jpg"}
+            src={eachChat.receiver?.avatar || "/noavatar.jpg"}
             alt=""
           />
-            <span>{eachChat.receiver.username}</span>
+            <span>{eachChat.receiver?.username}</span>
             <p>{eachChat.lastMessage}</p>
         </div>
         ))}
@@ -64,10 +81,10 @@ function Chat({chats}) {
           <div className="top">
             <div className="user">
               <img
-                src={chat.receiver.avatar || "/noavatar.jpg"}
+                src={chat.receiver?.avatar || "/noavatar.jpg"}
                 alt=""
               />
-              {chat.receiver.username}
+              {chat.receiver?.username}
             </div>
             <span className="close" onClick={()=>setChat(null)}>X</span>
           </div>

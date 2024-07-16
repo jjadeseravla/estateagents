@@ -13,17 +13,33 @@ export const getChats = async (req, res) => {
       // userIDs: tokenUserId
     }).exec();
 
-      // Iterate over each chat to find and attach the receiver information
-    for (const chat of chats) {
-      const receiverId = chat.userIDs.find((id) => id.toString() !== tokenUserId.toString());
-      // inputs 2 ids, and if its not our id, its the other user
-      const receiver = await UserModel.findById(receiverId).select('id username avatar').exec();
-      // gives back all user info but we just need username and avatar
-      // Attach the receiver's details to the chat object
-      chat.receiver = receiver;
-    }
+    //   // Iterate over each chat to find and attach the receiver information
+    // for (const chat of chats) {
+    //   const receiverId = chat.userIDs.find((id) => id.toString() !== tokenUserId.toString());
+    //   // inputs 2 ids, and if its not our id, its the other user
 
-    res.status(200).json(chats);
+    //   const receiver = await UserModel.findById(receiverId).select('id username avatar').exec();
+    //   // gives back all user info but we just need username and avatar
+    //   // Attach the receiver's details to the chat object
+    //   chat.receiver = receiver;
+    // }
+    // console.log('$$$$$$$$$$$$$$$$$$$$$$$$$CHATS', chats)
+    // //chats needs receiver inside but not there?!
+
+    // res.status(200).json(chats);
+     // Convert each chat to a plain JavaScript object and attach the receiver information
+     const chatWithReceivers = await Promise.all(chats.map(async (chat) => {
+      const chatObject = chat.toObject();
+      const receiverId = chatObject.userIDs.find(id => id.toString() !== tokenUserId.toString());
+
+      // Find receiver's information
+      const receiver = await UserModel.findById(receiverId).select('id username avatar').exec();
+      chatObject.receiver = receiver;
+
+      return chatObject;
+    }));
+
+    res.status(200).json(chatWithReceivers);
   } catch (e) {
     console.log(e);
     res.status(500).json({ message: 'failed to get chats' });
@@ -31,11 +47,10 @@ export const getChats = async (req, res) => {
 }
 
 export const getChat = async (req, res) => {
-
   const tokenUserId = req.userId;
   const chatId = req.params.id;
   console.log('Token User ID:', tokenUserId);
-  console.log('Chat ID:', chatId);
+  console.log('Chat ID HEREEEEEE:', chatId);
   try {
     const chat = await ChatModel.findOne({
       _id: chatId,
