@@ -74,5 +74,5 @@ const userSchema = new mongoose.Schema({
 
 // const User = mongoose.model('User', userSchema);
 
-const UserModel = mongoose.model('UserModel', userSchema); // Assign the model to a variable
+const UserModel = mongoose.model('User', userSchema); // Assign the model to a variable
 export default UserModel; // Export the model as default

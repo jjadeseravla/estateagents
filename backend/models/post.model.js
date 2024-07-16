@@ -123,6 +123,6 @@ const postSchema = new mongoose.Schema({
   savedPosts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'SavedPost' }]
 });
 
-const PostModel = mongoose.model('PostModel', postSchema);
+const PostModel = mongoose.model('Post', postSchema);
  export default PostModel;
 // const Post = mongoose.model('Post', postSchema);

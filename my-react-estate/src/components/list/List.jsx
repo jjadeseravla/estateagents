@@ -2,7 +2,7 @@ import './list.scss'
 import Card from"../card/Card.jsx"
 // import {listData} from "../../lib/dummyData.js"
 
-function List({posts}){
+function List({posts =[]}){
   return (
     <div className='list'>
       {posts.map(item=>(

@@ -57,5 +57,5 @@ const postDetailsSchema = new mongoose.Schema({
   postId: { type: mongoose.Schema.Types.ObjectId, ref: 'Post', unique: true, required: true }
 });
 
-const postDetailsModel = mongoose.model('PostDetailsModel', postDetailsSchema);
+const postDetailsModel = mongoose.model('PostDetail', postDetailsSchema);
 export default postDetailsModel;

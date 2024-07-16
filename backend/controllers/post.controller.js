@@ -1,5 +1,5 @@
 import PostModel from '../models/post.model.js';
-import savedPostModel from '../models/savedPost.model.js';
+import SavedPostModel from '../models/savedPost.model.js';
 import PostDetailsModel from '../models/postDetails.model.js';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
@@ -16,15 +16,14 @@ export const getPosts = async (req, res) => {
   }
 }
 
-
 export const getPost = async (req, res) => {
-  const id = req.params.id;
+  const postId = req.params.id; // Ensure the correct variable name is used
 
   console.log('***************', req.params)
 
   try {
-    const post = await PostModel.findById(id)
-    .populate('postDetails')
+    const post = await PostModel.findById(postId)
+      .populate('postDetail')
       .populate({
         path: 'userId',
         select: 'username avatar'
@@ -41,25 +40,28 @@ export const getPost = async (req, res) => {
     if (!token) {
       userId = null;
     } else {
-      jwt.verify(token, 'jwtsecretkey', async (err, payload) => { 
-        if (err) {
-          userId = null;
-        } else {
-          //we are authenticated
-          userId = payload.id;
-        }
-      })
+      userId = await new Promise((resolve, reject) => {
+        jwt.verify(token, 'jwtsecretkey', (err, payload) => {
+          if (err) {
+            resolve(null);
+          } else {
+            resolve(payload.id);
+          }
+        });
+      });
     }
 
-    const saved = await savedPostModel.findOne({
-      userId: id,
-      postId: postId
-    }).exec(); 
-    
-    res.status(200).json({ ...post, isSaved: saved ? true: false });
+    const saved = await SavedPostModel.findOne({
+      userId: userId,
+      postId: postId,
+    }).exec();
+
+    console.log('_______________final');
+
+    res.status(200).json({ ...post.toObject(), isSaved: saved ? true : false });
   } catch (e) {
     console.log(e);
-    res.status(500).json({message: 'failed to get postssss'})
+    res.status(500).json({ message: 'Failed to get specific post after saving' });
   }
 }
 
@@ -75,7 +77,7 @@ export const addPost = async (req, res) => {
     return res.status(400).json({ message: "postData is required" });
   }
 
-  if (!body.postDetail || !body.postDetail.desc) {
+  if (!body.postDetails || !body.postDetails.desc) {
     return res.status(400).json({ message: "postDetail with desc is required" });
   }
 
@@ -94,9 +96,10 @@ export const addPost = async (req, res) => {
 
     const savedPost = await newPost.save({ session });
     console.log('Saved new post:', savedPost);
+    console.log('*********** body.postDetails', body.postDetails)
 
     const postDetail = new PostDetailsModel({
-      ...body.postDetail,
+      ...body.postDetails,
       userId: tokenUserId,
       postId: savedPost._id
     });
@@ -108,7 +111,7 @@ export const addPost = async (req, res) => {
     const savedPostDetail = await postDetail.save({ session });
     console.log('Saved post detail:', savedPostDetail);
 
-    savedPost.postDetails.push(savedPostDetail._id);
+    savedPost.postDetail =savedPostDetail._id;
     await savedPost.save({ session });
     console.log('Updated post with post details:', savedPost);
 
@@ -191,7 +194,7 @@ export const updatePost = async (req, res) => {
     res.status(200).json()
   } catch (e) {
     console.log(e);
-    res.status(500).json({message: 'failed to get postssss'})
+    res.status(500).json({message: 'failed to get postssss after updating'})
   }
 }
 
@@ -211,7 +214,7 @@ export const deletePost = async (req, res) => {
     res.status(200).json({message: 'successfully deleted post'})
   } catch (e) {
     console.log(e);
-    res.status(500).json({message: 'failed to get postssss'})
+    res.status(500).json({message: 'failed to get postssss after deleting'})
   }
 }
 

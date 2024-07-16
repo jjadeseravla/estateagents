@@ -1,5 +1,6 @@
 import ChatModel from '../models/chat.model.js';
-import MessageModel from '../models/message.model.js';
+// import MessageModel from '../models/message.model.js';
+import UserModel from '../models/user.model.js';
 
 export const getChats = async (req, res) => {
 
@@ -7,8 +8,21 @@ export const getChats = async (req, res) => {
 
   try {
     const chats = await ChatModel.find({
-      userIDs: tokenUserId
+      // Find chats where tokenUserId is in userIDs
+      userIDs: { $in: [tokenUserId] }
+      // userIDs: tokenUserId
     }).exec();
+
+      // Iterate over each chat to find and attach the receiver information
+    for (const chat of chats) {
+      const receiverId = chat.userIDs.find((id) => id.toString() !== tokenUserId.toString());
+      // inputs 2 ids, and if its not our id, its the other user
+      const receiver = await UserModel.findById(receiverId).select('id username avatar').exec();
+      // gives back all user info but we just need username and avatar
+      // Attach the receiver's details to the chat object
+      chat.receiver = receiver;
+    }
+
     res.status(200).json(chats);
   } catch (e) {
     console.log(e);
@@ -19,12 +33,12 @@ export const getChats = async (req, res) => {
 export const getChat = async (req, res) => {
 
   const tokenUserId = req.userId;
-  // console.log(req);
-  //console.log('******************', tokenUserId, 'req.params.id', req.params.id)
-  // ITS THE SAMMMMMMMMME
+  const chatId = req.params.id;
+  console.log('Token User ID:', tokenUserId);
+  console.log('Chat ID:', chatId);
   try {
     const chat = await ChatModel.findOne({
-      _id: req.params.id,
+      _id: chatId,
       userIDs: tokenUserId,
     }).populate('messages').exec();
 
