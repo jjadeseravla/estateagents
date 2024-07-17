@@ -9,6 +9,7 @@ const io = new Server({
 //store all my users using unique ids
 //whenever we connect to our server, we create a new user
 //get the userId from our client and save it inside onlineuser arr
+//whenever we connect to socket, we need to create a new user
 let onlineUser = [];
 
 const addUser = (userId, socketId) => {
@@ -42,10 +43,23 @@ io.on("connection", (socket) => {
 
   socket.on("newUser", (userId) => {
     addUser(userId, socket.id);
+    console.log('onlineUser on socket/app', onlineUser); // should get userid and socketid
   });
 
   socket.on("sendMessage", ({ receiverId, data }) => {
-    console.log(receiverId);
+    console.log(receiverId, data);
+    // data should console.log the message which has: {
+  //           "_id": "66914f692f38c0ad5ccb3a72",
+  //           "text": "does this work today",
+  //           "userId": "669140907f4ce2b813be8224",
+  //           "chatId": "66914b3c86a06631be70e84b",
+  //           "createdAt": "2024-07-12T15:44:41.629Z",
+  //           "__v": 0
+    //       }
+    
+    const receiver = getUser(receiverId);
+    //send msg to other user and pass the socketId from other user
+    io.to(receiver.socketId).emit("getMessage", data);
   })
 
   //if we close our window/tab, we'll be disconnected:
