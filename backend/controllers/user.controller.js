@@ -1,5 +1,6 @@
 import UserModel from '../models/user.model.js';
 import PostModel from '../models/post.model.js';
+import ChatModel from '../models/chat.model.js';
 import SavedPostModel from '../models/savedPost.model.js';
 import bcrypt from '../node_modules/bcrypt/bcrypt.js'; 
 
@@ -110,6 +111,21 @@ export const profilePosts = async (req, res) => {
     const savedPosts = saved.map((item) => item.post);
 
     res.status(200).json({ userPosts, savedPosts});
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ message: 'failed to get profile posts' });
+  }
+}
+
+export const getNotificationNumber = async (req, res) => {
+  const tokenUserId = req.userId;
+  try {
+    const chats = await ChatModel.countDocuments({
+      userIDs: { $in: [tokenUserId] },
+      seenBy: { $nin: [tokenUserId] }
+    });
+
+    res.status(200).json(number);
   } catch (e) {
     console.log(e);
     res.status(500).json({ message: 'failed to get profile posts' });

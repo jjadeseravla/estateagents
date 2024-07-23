@@ -58,13 +58,18 @@ io.on("connection", (socket) => {
     //       }
     
     const receiver = getUser(receiverId);
-    //send msg to other user and pass the socketId from other user
-    io.to(receiver.socketId).emit("getMessage", data);
+    if (receiver) {
+      //send msg to other user and pass the socketId from other user
+      io.to(receiver.socketId).emit("getMessage", data);
+    } else {
+      console.error(`Receiver with ID ${receiverId} not found.`);
+    }
   })
 
   //if we close our window/tab, we'll be disconnected:
   socket.on("disconnect", () => {
-    removeUser(socket.id)
+    removeUser(socket.id);
+    console.log(`User with socket ID ${socket.id} disconnected.`);;
   })
 
 });

@@ -1,14 +1,23 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useRef, useContext, useEffect } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import "./chat.scss";
 import apiRequest from "../../lib/apiReq";
 import { format } from 'timeago.js';
 import { SocketContext } from "../../context/SocketContext";
+import { useNotificationStore } from "../../lib/notificationStore";
 
 function Chat({ chats }) {
   const [chat, setChat] = useState(null);
   const { currentUser } = useContext(AuthContext);
   const { socket } = useContext(SocketContext);
+
+  const messageEndRef = useRef();
+
+  const decrease = useNotificationStore((state) => state.decrease);
+
+  useEffect(() => {
+    messageEndRef.current?.scrollIntoView({ behaviour: "smooth" });
+  }, [chat])
 
   console.log('chats.receiver', chats.receiver);
 
@@ -18,6 +27,11 @@ function Chat({ chats }) {
       const apiUrl = "/chats/" + id;
       console.log('API URL:', apiUrl); // Log the constructed API URL
       const res = await apiRequest("/chats/" + id);
+
+      if (!res.data.seenBy.includes(currentUser.id)) {
+        // means this chat is unseen and we can decreases its number and never -1
+        decrease();
+      }
       setChat({ ...res.data, receiver });
     } catch (e) {
       console.log(e);
@@ -113,7 +127,7 @@ function Chat({ chats }) {
             <span className="close" onClick={() => setChat(null)}>X</span>
           </div>
           {chat.messages.map((message) => (
-            <div className="center" key={message.id}>
+            <div className="center" key={message._id}>
               <div className="chatMessage" style={{
                 alignSelf: message.userId === currentUser.id ? "flex-end" : "flex-start",
                 textAlign: message.userId === currentUser.id ? "right" : "left",
@@ -123,6 +137,7 @@ function Chat({ chats }) {
               </div>
             </div>
           ))}
+          <div ref={messageEndRef}></div>
           <form onSubmit={handleSubmit} className="bottom">
             <textarea name="text"></textarea>
             <button>Send</button>
